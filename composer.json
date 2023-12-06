@@ -2,7 +2,7 @@
     "name": "inilim/json_helper",
     "description": "json_helper",
     "type": "library",
-    "license": "Free",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Inilim\\": "src/"
