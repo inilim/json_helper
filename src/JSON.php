@@ -100,6 +100,17 @@ class JSON
       return $default;
    }
 
+   /**
+    * gettype - вернет null если json не валидный
+    */
+   public function getTypeFromJSON(?string $value): ?string
+   {
+      if (is_null($value)) return null;
+      $value = $this->decode($value, false);
+      if ($this->hasError()) return null;
+      return gettype($value);
+   }
+
    // ------------------------------------------------------------------
    // protected
    // ------------------------------------------------------------------
