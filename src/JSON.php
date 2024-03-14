@@ -117,7 +117,7 @@ class JSON
 
    protected function hasError(): bool
    {
-      return \json_last_error() !== JSON_ERROR_NONE;
+      return \json_last_error() !== \JSON_ERROR_NONE;
    }
 
    /**
