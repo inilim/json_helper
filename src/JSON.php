@@ -57,10 +57,10 @@ class JSON
    }
 
    /**
-    * @param mixed[]|array{} $default
-    * @return mixed[]|array{}
+    * @param mixed $default
+    * @return mixed
     */
-   public function tryDecodeAsArray(?string $value, array $default = []): array
+   public function tryDecodeAsArray(?string $value, $default = [])
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -68,7 +68,11 @@ class JSON
       return $default;
    }
 
-   public function tryDecodeAsObject(?string $value, object $default = new stdClass): object
+   /**
+    * @param mixed $default
+    * @return mixed
+    */
+   public function tryDecodeAsObject(?string $value, $default = new stdClass)
    {
       if ($value === null) return $default;
       $value = $this->decode($value, false);
@@ -76,7 +80,11 @@ class JSON
       return $default;
    }
 
-   public function tryDecodeAsString(?string $value, string $default = ''): string
+   /**
+    * @param mixed $default
+    * @return mixed
+    */
+   public function tryDecodeAsString(?string $value, $default = '')
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -84,7 +92,11 @@ class JSON
       return $default;
    }
 
-   public function tryDecodeAsInteger(?string $value, int $default = 0): int
+   /**
+    * @param mixed $default
+    * @return mixed
+    */
+   public function tryDecodeAsInteger(?string $value, $default = 0)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -92,7 +104,11 @@ class JSON
       return $default;
    }
 
-   public function tryDecodeAsFloat(?string $value, float $default = 0.0): float
+   /**
+    * @param mixed $default
+    * @return mixed
+    */
+   public function tryDecodeAsFloat(?string $value, $default = 0.0)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
