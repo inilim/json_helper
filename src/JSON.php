@@ -6,7 +6,7 @@ use stdClass;
 
 class JSON
 {
-   public function isJSON(?string $value): bool
+   function isJSON(?string $value): bool
    {
       if ($value === null) return false;
       $this->decode($value);
@@ -16,7 +16,7 @@ class JSON
    /**
     * @param boolean $strict true если вы ожидаете именно массив "[...]" | false если вы ожидаете массив или обьект как массив "[...]"|"{...}"
     */
-   public function isJSONAsArray(?string $value, bool $strict = false): bool
+   function isJSONAsArray(?string $value, bool $strict = false): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value, (!$strict ? true : false));
@@ -24,7 +24,7 @@ class JSON
       return \is_array($value);
    }
 
-   public function isJSONAsObject(?string $value): bool
+   function isJSONAsObject(?string $value): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value, false);
@@ -32,7 +32,7 @@ class JSON
       return \is_object($value);
    }
 
-   public function isJSONAsInteger(?string $value): bool
+   function isJSONAsInteger(?string $value): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value);
@@ -40,7 +40,7 @@ class JSON
       return \is_int($value);
    }
 
-   public function isJSONAsString(?string $value): bool
+   function isJSONAsString(?string $value): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value);
@@ -48,7 +48,7 @@ class JSON
       return \is_string($value);
    }
 
-   public function isJSONAsFloat(?string $value): bool
+   function isJSONAsFloat(?string $value): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value);
@@ -60,7 +60,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   public function tryDecodeAsArray(?string $value, $default = [])
+   function tryDecodeAsArray(?string $value, $default = [])
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -68,11 +68,20 @@ class JSON
       return $default;
    }
 
+   function dataGetFromJSON(?string $json, string $key_dot, $default = null)
+   {
+      return \_arr()->dataGet(
+         $this->tryDecodeAsArray($json, []),
+         $key_dot,
+         $default,
+      );
+   }
+
    /**
     * @param mixed $default
     * @return mixed
     */
-   public function tryDecodeAsObject(?string $value, $default = new stdClass)
+   function tryDecodeAsObject(?string $value, $default = new stdClass)
    {
       if ($value === null) return $default;
       $value = $this->decode($value, false);
@@ -84,7 +93,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   public function tryDecodeAsString(?string $value, $default = '')
+   function tryDecodeAsString(?string $value, $default = '')
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -96,7 +105,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   public function tryDecodeAsInteger(?string $value, $default = 0)
+   function tryDecodeAsInteger(?string $value, $default = 0)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -108,7 +117,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   public function tryDecodeAsFloat(?string $value, $default = 0.0)
+   function tryDecodeAsFloat(?string $value, $default = 0.0)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -119,12 +128,17 @@ class JSON
    /**
     * gettype - вернет null если json не валидный
     */
-   public function getTypeFromJSON(?string $value): ?string
+   function getTypeFromJSON(?string $value): ?string
    {
       if ($value === null) return null;
       $value = $this->decode($value, false);
       if ($this->hasError()) return null;
       return \gettype($value);
+   }
+
+   function getLastErrorCode(): int
+   {
+      return \json_last_error();
    }
 
    // ------------------------------------------------------------------
