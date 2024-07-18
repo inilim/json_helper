@@ -70,8 +70,10 @@ class JSON
 
    function dataGetFromJSON(?string $json, string $key_dot, $default = null)
    {
+      $t = $this->tryDecodeAsArray($json, []);
+      if (!$t) return $default;
       return \_arr()->dataGet(
-         $this->tryDecodeAsArray($json, []),
+         $t,
          $key_dot,
          $default,
       );
