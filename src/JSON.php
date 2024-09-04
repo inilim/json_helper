@@ -2,8 +2,6 @@
 
 namespace Inilim\JSON;
 
-use stdClass;
-
 class JSON
 {
    function isJSON(?string $value): bool
@@ -11,6 +9,14 @@ class JSON
       if ($value === null) return false;
       $this->decode($value);
       return !$this->hasError();
+   }
+
+   /**
+    * @param mixed $value
+    */
+   function isJSONSerializable($value, int $flags = 0, int $depth = 512): bool
+   {
+      return \json_encode($value, $flags, $depth) !== false;
    }
 
    /**
@@ -60,7 +66,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsArray(?string $value, $default = [])
+   function tryDecodeAsArray(?string $value, $default = null)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -83,7 +89,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsObject(?string $value, $default = new stdClass)
+   function tryDecodeAsObject(?string $value, $default = null)
    {
       if ($value === null) return $default;
       $value = $this->decode($value, false);
@@ -95,7 +101,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsString(?string $value, $default = '')
+   function tryDecodeAsString(?string $value, $default = null)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -107,7 +113,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsInteger(?string $value, $default = 0)
+   function tryDecodeAsInteger(?string $value, $default = null)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
@@ -119,7 +125,7 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsFloat(?string $value, $default = 0.0)
+   function tryDecodeAsFloat(?string $value, $default = null)
    {
       if ($value === null) return $default;
       $value = $this->decode($value);
