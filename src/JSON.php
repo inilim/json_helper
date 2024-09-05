@@ -71,10 +71,10 @@ class JSON
     * @param mixed $default
     * @return mixed
     */
-   function tryDecodeAsArray(?string $value, $default = null)
+   function tryDecodeAsArray(?string $value, $default = null, bool $object_to_assoc = false)
    {
       if ($value === null) return $default;
-      $value = $this->decode($value);
+      $value = $this->decode($value, $object_to_assoc);
       if (\is_array($value)) return $value;
       return $default;
    }
