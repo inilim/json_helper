@@ -16,10 +16,10 @@ class JSON
     */
    function isJSONSerializable($value, int $flags = 0, int $depth = 512): bool
    {
-      return \json_encode($value, $flags, $depth) !== false;
+      return $this->tryEncode($value, $flags, $depth) === null ? false : true;
    }
 
-   function isJSONAsArray(?string $value): bool
+   function isJSONAsArrList(?string $value): bool
    {
       if ($value === null) return false;
       $value = $this->decode($value);
@@ -27,6 +27,22 @@ class JSON
       return \is_array($value);
    }
 
+   /**
+    * array assoc OR array list | analogue "isJSONAsArrOrObj"
+    */
+   function isJSONAsArray(?string $value): bool
+   {
+      return $this->isJSONAsArrOrObj($value);
+   }
+
+   function isJSONAsArrAssoc(?string $value): bool
+   {
+      return $this->isJSONAsObject($value);
+   }
+
+   /**
+    * analogue "isJSONAsArray"
+    */
    function isJSONAsArrOrObj(?string $value): bool
    {
       if ($value === null) return false;
@@ -67,17 +83,93 @@ class JSON
       return \is_float($value);
    }
 
+   // ------------------------------------------------------------------
+   // 
+   // ------------------------------------------------------------------
+
    /**
-    * @param mixed $default
-    * @return mixed
+    * @template T
+    * @param T $default
+    * @return list<mixed>|T
     */
-   function tryDecodeAsArray(?string $value, $default = null, bool $object_to_assoc = false)
+   function tryDecodeAsArrList(?string $value, $default = null)
    {
       if ($value === null) return $default;
-      $value = $this->decode($value, $object_to_assoc);
+      $value = $this->decode($value);
       if (\is_array($value)) return $value;
       return $default;
    }
+
+   /**
+    * object to array
+    * 
+    * @template T
+    * @param T $default
+    * @return mixed[]|array{}|T
+    */
+   function tryDecodeAsArray(?string $value, $default = null)
+   {
+      if ($value === null) return $default;
+      $value = $this->decode($value, true);
+      if (\is_array($value)) return $value;
+      return $default;
+   }
+
+   /**
+    * @template T
+    * @param T $default
+    * @return object|T
+    */
+   function tryDecodeAsObject(?string $value, $default = null)
+   {
+      if ($value === null) return $default;
+      $value = $this->decode($value);
+      if (\is_object($value)) return $value;
+      return $default;
+   }
+
+   /**
+    * @template T
+    * @param T $default
+    * @return string|T
+    */
+   function tryDecodeAsString(?string $value, $default = null)
+   {
+      if ($value === null) return $default;
+      $value = $this->decode($value);
+      if (\is_string($value)) return $value;
+      return $default;
+   }
+
+   /**
+    * @template T
+    * @param T $default
+    * @return int|T
+    */
+   function tryDecodeAsInteger(?string $value, $default = null)
+   {
+      if ($value === null) return $default;
+      $value = $this->decode($value);
+      if (\is_int($value)) return $value;
+      return $default;
+   }
+
+   /**
+    * @template T
+    * @param T $default
+    * @return float|T
+    */
+   function tryDecodeAsFloat(?string $value, $default = null)
+   {
+      if ($value === null) return $default;
+      $value = $this->decode($value);
+      if (\is_float($value)) return $value;
+      return $default;
+   }
+
+   // ------------------------------------------------------------------
+   // 
+   // ------------------------------------------------------------------
 
    function dataGetFromJSON(?string $json, string $key_dot, $default = null)
    {
@@ -91,54 +183,6 @@ class JSON
    }
 
    /**
-    * @param mixed $default
-    * @return mixed
-    */
-   function tryDecodeAsObject(?string $value, $default = null)
-   {
-      if ($value === null) return $default;
-      $value = $this->decode($value);
-      if (\is_object($value)) return $value;
-      return $default;
-   }
-
-   /**
-    * @param mixed $default
-    * @return mixed
-    */
-   function tryDecodeAsString(?string $value, $default = null)
-   {
-      if ($value === null) return $default;
-      $value = $this->decode($value);
-      if (\is_string($value)) return $value;
-      return $default;
-   }
-
-   /**
-    * @param mixed $default
-    * @return mixed
-    */
-   function tryDecodeAsInteger(?string $value, $default = null)
-   {
-      if ($value === null) return $default;
-      $value = $this->decode($value);
-      if (\is_int($value)) return $value;
-      return $default;
-   }
-
-   /**
-    * @param mixed $default
-    * @return mixed
-    */
-   function tryDecodeAsFloat(?string $value, $default = null)
-   {
-      if ($value === null) return $default;
-      $value = $this->decode($value);
-      if (\is_float($value)) return $value;
-      return $default;
-   }
-
-   /**
     * gettype - вернет null если json не валидный
     */
    function getTypeFromJSON(?string $value): ?string
@@ -147,6 +191,11 @@ class JSON
       $value = $this->decode($value, false);
       if ($this->hasError()) return null;
       return \gettype($value);
+   }
+
+   function getLastErrorMsg(): string
+   {
+      return \json_last_error_msg();
    }
 
    function getLastErrorCode(): int
@@ -159,15 +208,73 @@ class JSON
       return \json_last_error() !== \JSON_ERROR_NONE;
    }
 
+   // ------------------------------------------------------------------
+   // 
+   // ------------------------------------------------------------------
+
    /**
     * @return mixed
     */
    function decode(
       string $value,
       ?bool $associative = null,
-      int $depth = 512,
-      int $flags = 0
+      int $depth         = 512,
+      int $flags         = 0
    ) {
       return \json_decode($value, $associative, $depth, $flags);
+   }
+
+   /**
+    * @param mixed $value
+    */
+   function encode($value, int $flags = 0, int $depth = 512): string|false
+   {
+      return \json_encode($value, $flags, $depth);
+   }
+
+   /**
+    * the method does not throw exceptions JsonException, instead it returns the default value
+    * 
+    * @template T
+    * @param T $default
+    * @return mixed|T
+    */
+   function tryDecode(
+      string $value,
+      ?bool $associative = null,
+      int $depth         = 512,
+      int $flags         = 0,
+      $default           = null,
+   ) {
+      try {
+         $value = \json_decode($value, $associative, $depth, $flags);
+      } catch (\JsonException) {
+         return $default;
+      }
+      if ($this->hasError()) {
+         return $default;
+      }
+      return $value;
+   }
+
+   /**
+    * the method does not throw exceptions JsonException, instead it returns the default value
+    * 
+    * @template T
+    * @param T $default return default if failed encode
+    * @param mixed $value
+    * @return string|T
+    */
+   function tryEncode($value, int $flags = 0, int $depth = 512, $default = null)
+   {
+      try {
+         $value = \json_encode($value, $flags, $depth);
+      } catch (\JsonException) {
+         return $default;
+      }
+      if ($value === false) {
+         return $default;
+      }
+      return $value;
    }
 }
