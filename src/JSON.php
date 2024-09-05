@@ -19,21 +19,26 @@ class JSON
       return \json_encode($value, $flags, $depth) !== false;
    }
 
-   /**
-    * @param boolean $strict true если вы ожидаете именно массив "[...]" | false если вы ожидаете массив или обьект как массив "[...]"|"{...}"
-    */
-   function isJSONAsArray(?string $value, bool $strict = false): bool
+   function isJSONAsArray(?string $value): bool
    {
       if ($value === null) return false;
-      $value = $this->decode($value, (!$strict ? true : false));
+      $value = $this->decode($value);
       if ($this->hasError()) return false;
       return \is_array($value);
+   }
+
+   function isJSONAsArrOrObj(?string $value): bool
+   {
+      if ($value === null) return false;
+      $value = $this->decode($value);
+      if ($this->hasError()) return false;
+      return \is_array($value) || \is_object($value);
    }
 
    function isJSONAsObject(?string $value): bool
    {
       if ($value === null) return false;
-      $value = $this->decode($value, false);
+      $value = $this->decode($value);
       if ($this->hasError()) return false;
       return \is_object($value);
    }
@@ -92,7 +97,7 @@ class JSON
    function tryDecodeAsObject(?string $value, $default = null)
    {
       if ($value === null) return $default;
-      $value = $this->decode($value, false);
+      $value = $this->decode($value);
       if (\is_object($value)) return $value;
       return $default;
    }
@@ -149,11 +154,7 @@ class JSON
       return \json_last_error();
    }
 
-   // ------------------------------------------------------------------
-   // protected
-   // ------------------------------------------------------------------
-
-   protected function hasError(): bool
+   function hasError(): bool
    {
       return \json_last_error() !== \JSON_ERROR_NONE;
    }
@@ -161,9 +162,9 @@ class JSON
    /**
     * @return mixed
     */
-   protected function decode(
+   function decode(
       string $value,
-      bool $associative = true,
+      ?bool $associative = null,
       int $depth = 512,
       int $flags = 0
    ) {
