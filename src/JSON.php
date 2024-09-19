@@ -2,6 +2,8 @@
 
 namespace Inilim\JSON;
 
+use Inilim\FuncCore\FuncCore;
+
 class JSON
 {
    function isJSON(?string $value): bool
