@@ -69,6 +69,14 @@ class JSON
       return \is_int($value);
    }
 
+   function isJSONAsNumeric(?string $value): bool
+   {
+      if ($value === null) return false;
+      $value = $this->decode($value);
+      if ($this->hasError()) return false;
+      return FuncCore::isNumeric($value);
+   }
+
    function isJSONAsString(?string $value): bool
    {
       if ($value === null) return false;
