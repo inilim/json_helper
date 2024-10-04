@@ -281,14 +281,14 @@ final class JSON
    {
       try {
          // @phpstan-ignore-next-line
-         $value = \json_encode($value, $flags, $depth);
+         $json = \json_encode($value, $flags, $depth);
       } catch (\JsonException $e) {
          return $default;
       }
-      if ($value === false) {
+      if ($json === false) {
          return $default;
       }
-      return $value;
+      return $json;
    }
 
    /**
