@@ -2,9 +2,7 @@
 
 namespace Inilim\JSON;
 
-use Inilim\FuncCore\FuncCore;
-
-class JSON
+final class JSON
 {
    function isJSON(?string $value): bool
    {
@@ -74,7 +72,7 @@ class JSON
       if ($value === null) return false;
       $value = $this->decode($value);
       if ($this->hasError()) return false;
-      return FuncCore::isNumeric($value);
+      return $this->isNumeric($value);
    }
 
    function isJSONAsString(?string $value): bool
@@ -181,16 +179,16 @@ class JSON
    // 
    // ------------------------------------------------------------------
 
-   function dataGetFromJSON(?string $json, string $key_dot, $default = null)
-   {
-      $t = $this->tryDecodeAsArray($json, []);
-      if (!$t) return $default;
-      return \_arr()->dataGet(
-         $t,
-         $key_dot,
-         $default,
-      );
-   }
+   // function dataGetFromJSON(?string $json, string $key_dot, $default = null)
+   // {
+   //    $t = $this->tryDecodeAsArray($json, []);
+   //    if (!$t) return $default;
+   //    return \_arr()->dataGet(
+   //       $t,
+   //       $key_dot,
+   //       $default,
+   //    );
+   // }
 
    /**
     * gettype - вернет null если json не валидный
@@ -231,14 +229,17 @@ class JSON
       int $depth         = 512,
       int $flags         = 0
    ) {
+      // @phpstan-ignore-next-line
       return \json_decode($value, $associative, $depth, $flags);
    }
 
    /**
     * @param mixed $value
+    * @return string|false
     */
-   function encode($value, int $flags = 0, int $depth = 512): string|false
+   function encode($value, int $flags = 0, int $depth = 512)
    {
+      // @phpstan-ignore-next-line
       return \json_encode($value, $flags, $depth);
    }
 
@@ -254,11 +255,12 @@ class JSON
       ?bool $associative = null,
       int $depth         = 512,
       int $flags         = 0,
-      $default           = null,
+      $default           = null
    ) {
       try {
+         // @phpstan-ignore-next-line
          $value = \json_decode($value, $associative, $depth, $flags);
-      } catch (\JsonException) {
+      } catch (\JsonException $e) {
          return $default;
       }
       if ($this->hasError()) {
@@ -278,13 +280,26 @@ class JSON
    function tryEncode($value, int $flags = 0, int $depth = 512, $default = null)
    {
       try {
+         // @phpstan-ignore-next-line
          $value = \json_encode($value, $flags, $depth);
-      } catch (\JsonException) {
+      } catch (\JsonException $e) {
          return $default;
       }
       if ($value === false) {
          return $default;
       }
       return $value;
+   }
+
+   /**
+    * TODO данный метод взят из библиотеки inilim/integer
+    * @param mixed $v
+    */
+   protected function isNumeric($v): bool
+   {
+      if (!\is_scalar($v) || \is_bool($v)) return false;
+      // here string|int|float
+      if (\preg_match('#^\-?[1-9][0-9]{0,}$|^0$#', \strval($v))) return true;
+      return false;
    }
 }

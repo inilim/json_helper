@@ -17,13 +17,12 @@
         }
     ],
     "require": {
-        "php": "^8.2",
-        "inilim/array": "dev-main",
-        "inilim/func_core": "dev-main"
+        "php": "^7.4 | ^8.2"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require-dev": {
-        "phpstan/phpstan": "@stable"
+        "phpstan/phpstan": "@stable",
+        "inilim/dump": "dev-main"
     }
 }
